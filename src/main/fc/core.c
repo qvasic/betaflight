@@ -39,9 +39,12 @@
 #include "common/filter.h"
 #include "common/maths.h"
 #include "common/utils.h"
+#include "common/printf.h"
 
 #include "config/config.h"
 #include "config/feature.h"
+
+#include "osd/osd_elements.h"
 
 #include "drivers/dshot.h"
 #include "drivers/dshot_command.h"
@@ -553,6 +556,27 @@ void tryArm(void)
         osdSuppressStats(false);
 #endif
         ENABLE_ARMING_FLAG(ARMED);
+
+
+
+
+
+        static uint8_t arm_count = 0;
+        ++arm_count;
+        char arm_count_bits[9];
+        to_bits( arm_count, arm_count_bits );
+        arm_count_bits[8] = 0;
+
+        char bufffer[80]="";
+        tfp_sprintf(bufffer, "ARMED %u MS\n", millis());
+        debug_console_print( bufffer );
+        tfp_sprintf(bufffer, "ARM COUNT %u BITS %s\n", (unsigned)arm_count, arm_count_bits);
+        debug_console_print( bufffer );
+
+
+
+
+
 
         resetTryingToArm();
 

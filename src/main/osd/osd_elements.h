@@ -64,3 +64,8 @@ void osdSyncBlink();
 void osdResetAlarms(void);
 void osdUpdateAlarms(void);
 bool osdElementsNeedAccelerometer(void);
+
+void debug_console_print( const char* text );
+void debug_console_draw( displayPort_t *display_port );
+void to_bits( uint8_t byte, char* string_ptr );
+

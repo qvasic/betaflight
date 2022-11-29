@@ -1018,10 +1018,107 @@ static void osdElementReadyMode(osdElementParms_t *element)
     }
 }
 
+
+
+
+
+
+
+#define CONSOLE_WIDTH 25
+#define CONSOLE_HEIGHT 10
+
+#ifdef USE_GPS
+char debug_console[CONSOLE_HEIGHT][CONSOLE_WIDTH+1]={"HELL0","","WHO R U! GPS!!1",""};
+#else
+char debug_console[CONSOLE_HEIGHT][CONSOLE_WIDTH]={"HELL0","","WHO R U!",""};
+#endif
+unsigned cursor_y = 3;
+unsigned cursor_x = 0;
+
+static void debug_console_newline(void)
+{
+    debug_console[cursor_y][cursor_x] = 0;
+    cursor_x = 0;
+    if( cursor_y < CONSOLE_HEIGHT-1 )
+    {
+        ++cursor_y;
+    }
+    else
+    {
+        for( unsigned i = 0; i < CONSOLE_HEIGHT-1; ++i )
+        {
+            strcpy( debug_console[i], debug_console[i+1] );
+        }
+    }
+    debug_console[cursor_y][cursor_x] = 0;
+}
+
+void debug_console_print( const char* text )
+{
+    for( ; *text; ++text )
+    {
+        if( *text == '\n' )
+        {
+            debug_console_newline();
+            continue;
+        }
+
+        debug_console[cursor_y][cursor_x] = *text;
+        ++cursor_x;
+        if( cursor_x >= CONSOLE_WIDTH )
+        {
+            debug_console_newline();
+        }
+    }
+
+    /*
+    // add proper line wrap and moving the whole screen
+    strncpy(debug_console[cursor_y], text, CONSOLE_WIDTH);
+    debug_console[cursor_y][CONSOLE_WIDTH-1] = 0;
+    ++cursor_y;
+    if( cursor_y >= CONSOLE_HEIGHT )
+    {
+        cursor_y = 0;
+    }
+    */
+}
+
+void debug_console_draw( displayPort_t *display_port )
+{
+    // add blinking cursor at the end
+    const int DEBUG_X = 1;
+    const int DEBUG_Y = 1;
+
+    for( int i=0; i<CONSOLE_HEIGHT; ++i )
+    {
+        displayWrite(display_port, DEBUG_X, DEBUG_Y + i, DISPLAYPORT_ATTR_NORMAL, debug_console[i]);
+    }
+}
+
+void to_bits( uint8_t byte, char* string_ptr )
+{
+    for( int i=0x40; i; i>>=1 )
+    {
+        //*string_ptr = (byte & 0x40) ? '1' : '0';
+        *string_ptr = (byte & i) ? '1' : '0';
+        ++string_ptr;
+        //byte <<= 1;
+    }
+}
+
+
+
+
+
+
+
+
 #ifdef USE_ACC
 static void osdElementGForce(osdElementParms_t *element)
 {
-    osdPrintFloat(element->buff, SYM_NONE, osdGForce, "", 1, true, 'G');
+    debug_console_draw( element->osdDisplayPort );
+    element->drawElement = false;
+    //osdPrintFloat(element->buff, SYM_NONE, osdGForce, "", 1, true, 'G');
 }
 #endif // USE_ACC
 

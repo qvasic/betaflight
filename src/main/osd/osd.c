@@ -33,6 +33,7 @@
 #include <math.h>
 
 #include "platform.h"
+#include "osd/osd_elements.h"
 
 #ifdef USE_OSD
 
@@ -1045,7 +1046,9 @@ static bool osdRefreshStats(void)
         phase = RENDER_STATS;
         break;
     case RENDER_STATS:
-        completed = osdRenderStatsContinue();
+        debug_console_draw(osdDisplayPort);
+        //completed = osdRenderStatsContinue();
+        completed = true;
         break;
     };
 
